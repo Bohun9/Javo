@@ -1,0 +1,4 @@
+(library
+ (name lang)
+ (preprocess (pps ppx_deriving.std))
+ (flags (:standard -w -26-27)))

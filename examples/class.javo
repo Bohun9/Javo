@@ -1,0 +1,16 @@
+class A extends Object {
+    int x;
+    int y;
+
+    method init(int x, int y) -> A {
+        this.x := x;
+        this.y := y;
+        this
+    }
+
+    method mthd() -> int {
+        this.x * this.y
+    }
+}
+
+new A.init(3, 4).mthd()

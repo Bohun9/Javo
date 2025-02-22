@@ -1,0 +1,4 @@
+(executable
+ (public_name javo)
+ (name main)
+ (libraries javo lang))

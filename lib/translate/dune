@@ -1,0 +1,4 @@
+(library
+ (name translate)
+ (libraries lang)
+ (flags (:standard -w -26-27)))

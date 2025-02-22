@@ -1,0 +1,10 @@
+(library
+ (name javo)
+ (preprocess (pps ppx_deriving.std))
+ (libraries lang translate)
+ (flags (:standard -w -26-27)))
+
+(ocamllex lexer)
+(menhir
+  (modules parser)
+  (flags --explain))
