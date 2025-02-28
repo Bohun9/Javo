@@ -16,6 +16,8 @@ void init_vm(vm_state* vm) {
 }
 
 void free_vm(vm_state *vm) {
+    vm->sp = 0;
+    garbage_collection(vm);
     free_gc_info(&vm->gc_info);
 }
 
@@ -224,7 +226,5 @@ int main(int argc, char** argv) {
 end:
     assert(vm.sp == 1);
     print_value(vm.data_stack[0]);
-    vm.sp = 0;
-    garbage_collection(&vm);
     free_vm(&vm);
 }
