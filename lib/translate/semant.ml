@@ -125,7 +125,11 @@ let rec trans_expr (e : S.expr) (env : var_table) : S.ty =
     (match t1 with
      | S.TBool -> ()
      | _ -> type_error "If guard should have type bool");
-    if t2 == t3 then t2 else type_error "If branches should have the same type"
+    if ClassInfo.subtype_of !class_info t2 t3
+    then t3
+    else if ClassInfo.subtype_of !class_info t3 t2
+    then t2
+    else type_error "If branches should have the same type"
 ;;
 
 let trans_function

@@ -1,0 +1,24 @@
+class List extends Object {
+    int data;
+    List rest;
+
+    method init(int data, List rest) -> List {
+        this.data := data;
+        this.rest := rest;
+        this
+    }
+}
+
+class ListBuilder extends Object {
+    method create(int n) -> List {
+        if n == 0 then
+            null
+        else
+            new List.init(n, this.create(n - 1))
+    }
+}
+
+new ListBuilder.create(127);
+new ListBuilder.create(127);
+new ListBuilder.create(127);
+0 // @stdout:0

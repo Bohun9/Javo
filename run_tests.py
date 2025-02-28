@@ -43,7 +43,9 @@ def run_test(test_file):
 
     if actual_exitcode == 0:
         with open(os.devnull, "w") as fnull:
-            subprocess.run(["make", VM_NAME], cwd=VM_DIR, stdout=fnull, stderr=fnull)
+            subprocess.run(
+                ["make", "-B", VM_NAME], cwd=VM_DIR, stdout=fnull, stderr=fnull
+            )
         run_process = subprocess.run(
             [VM_EXE, TEST_BYTECODE_FILE], capture_output=True, text=True
         )

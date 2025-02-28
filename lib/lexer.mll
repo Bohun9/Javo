@@ -44,8 +44,8 @@ let make_symbol s =
 
 let digit = ['0'-'9']
 let int = digit+
-let lower_identifier = ['a'-'z' '_'] ['a'-'z' '_' '0'-'9']*
-let upper_identifier = ['A'-'Z'] ['a'-'z' '_' '0'-'9']*
+let lower_identifier = ['a'-'z' '_'] ['a'-'z' 'A'-'Z' '_' '0'-'9']*
+let upper_identifier = ['A'-'Z'] ['a'-'z' 'A'-'Z' '_' '0'-'9']*
 let symbol = ['(' ')' '{' '}' '.' ',' ';' '=' '+' '-' '*'] | ":=" | "->" | "=="
 
 rule token = parse

@@ -6,7 +6,8 @@ let pipeline (source : string) : Lang.Bytecode.bytecode =
       let pos = Lexing.lexeme_start_p lexbuf in
       let line = pos.pos_lnum in
       let column = pos.pos_cnum - pos.pos_bol in
-      failwith (Printf.sprintf "Syntax error at (%d, %d)" line column)
+      Printf.eprintf "Syntax error at (%d, %d)" line column;
+      exit 1
   in
   let () = Translate.Semant.trans_program ast in
   let bytecode = Translate.Codegen.get_bytecode () in

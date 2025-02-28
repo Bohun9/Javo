@@ -4,13 +4,19 @@
 #include <assert.h>
 #include "instr.h"
 #include "vm.h"
+#include "gc.h"
 
-vm_state vm; // avoid using malloc?
+vm_state vm;
 
 void init_vm(vm_state* vm) {
     vm->sp = 0;
     vm->fp = 0;
     vm->frame_stack[0] = (frame) { .ip = 0, .bp = 0 };
+    init_gc_info(&vm->gc_info);
+}
+
+void free_vm(vm_state *vm) {
+    free_gc_info(&vm->gc_info);
 }
 
 void read_bytecode(vm_state* vm, char* file_path) {
@@ -84,8 +90,12 @@ void push_object(vm_state* vm, object* obj) {
     });
 }
 
+value top(vm_state* vm) {
+    return vm->data_stack[vm->sp - 1];
+}
+
 value pop(vm_state* vm) {
-    return vm->data_stack[vm->sp-- - 1];
+    return vm->data_stack[--vm->sp];
 }
 
 void push_frame(vm_state* vm, int64_t ip, int64_t bp) {
@@ -149,11 +159,9 @@ int main(int argc, char** argv) {
                 push_int(&vm, v1.payload.n == v2.payload.n);
                 break;
             case INEW_OBJECT:
-                int64_t class_table_offset = read_int64(&vm);
-                int64_t num_fields = read_int64_at_offset(&vm, class_table_offset);
-                object* obj = malloc(sizeof(object) + num_fields * sizeof(value));
-                obj->class_table = class_table_offset;
-                push_object(&vm, obj);
+                int64_t class_table = read_int64(&vm);
+                object* o = allocate_object(&vm, class_table);
+                push_object(&vm, o);
                 break;
             case IMETHOD_CALL:
                 int64_t method_index = read_int64(&vm);
@@ -162,17 +170,17 @@ int main(int argc, char** argv) {
                 //                           ^
                 //                           sp
                 int64_t object_offset = vm.sp - num_args - 1;
-                class_table_offset = vm.data_stack[object_offset].payload.obj->class_table;
-                int64_t call_dest = read_int64_at_offset(&vm, class_table_offset + sizeof(int64_t) * (1 + method_index));
+                class_table = vm.data_stack[object_offset].payload.obj->class_table;
+                int64_t call_dest = read_int64_at_offset(&vm, class_table + sizeof(int64_t) * (1 + method_index));
                 push_frame(&vm, call_dest, object_offset);
                 break;
             case ILOCAL_ASSIGN:
                 stack_loc = read_int64(&vm);
-                vm.data_stack[bp(&vm) + stack_loc] = vm.data_stack[vm.sp - 1];
+                vm.data_stack[bp(&vm) + stack_loc] = top(&vm);
                 break;
             case IFIELD_ASSIGN:
                 int64_t field_index = read_int64(&vm);
-                vm.data_stack[vm.sp - 2].payload.obj->fields[field_index] = vm.data_stack[vm.sp - 1];
+                vm.data_stack[vm.sp - 2].payload.obj->fields[field_index] = top(&vm);
                 pop(&vm);
                 break;
             case IFETCH:
@@ -185,7 +193,7 @@ int main(int argc, char** argv) {
                 pop(&vm);
                 break;
             case IRETURN:
-                vm.data_stack[bp(&vm)] = vm.data_stack[vm.sp - 1];
+                vm.data_stack[bp(&vm)] = top(&vm);
                 vm.sp = bp(&vm) + 1;
                 vm.fp--;
                 break;
@@ -216,4 +224,7 @@ int main(int argc, char** argv) {
 end:
     assert(vm.sp == 1);
     print_value(vm.data_stack[0]);
+    vm.sp = 0;
+    garbage_collection(&vm);
+    free_vm(&vm);
 }
