@@ -8,9 +8,9 @@ class A extends Object {
         this
     }
 
-    method mthd() -> int {
+    method m() -> int {
         this.x * this.y
     }
 }
 
-new A.init(3, 4).mthd()
+new A.init(3, 4).m() //@stdout:12

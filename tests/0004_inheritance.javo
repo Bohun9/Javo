@@ -1,0 +1,33 @@
+class Base extends Object {
+    int base;
+    method base() -> int { this.base }
+    method m() -> int { 0 }
+}
+
+class A extends Base {
+    int a;
+
+    method init(int base, int a) -> A {
+        this.base := base;
+        this.a := a;
+        this
+    }
+
+    method m() -> int { this.a }
+}
+
+class B extends Base {
+    int b;
+
+    method init(int base, int b) -> B {
+        this.base := base;
+        this.b := b;
+        this
+    }
+
+    method m() -> int { this.b }
+}
+
+let Base o1 := new A.init(1, 10) in
+let Base o2 := new B.init(100, 1000) in
+o1.base() + o1.m() + o2.base() + o2.m() //@stdout:1111

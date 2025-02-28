@@ -7,4 +7,4 @@ class Factorial extends Object {
     }
 }
 
-new Factorial.factorial(10)
+new Factorial.factorial(10) //@stdout:3628800

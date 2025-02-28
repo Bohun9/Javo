@@ -51,6 +51,7 @@ let symbol = ['(' ')' '{' '}' '.' ',' ';' '=' '+' '-' '*'] | ":=" | "->" | "=="
 rule token = parse
   | [' ' '\t']             { token lexbuf }
   | ['\n']                 { Lexing.new_line lexbuf; token lexbuf }
+  | "//" [^ '\n']*         { token lexbuf }
   | int as i               { NUM (int_of_string i) }
   | lower_identifier as id { make_lid id }
   | upper_identifier as id { UID id }
